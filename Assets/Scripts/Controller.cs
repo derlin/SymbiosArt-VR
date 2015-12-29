@@ -13,7 +13,7 @@ public class Controller : MonoBehaviour
 
     public GameObject Grid, ImagePreviewManager;
 
-    private DataDefinitions.User user;
+    private UserUtils.User user;
     private Cell[] cells;
     private CacheManager cacheManager;
     private List<DataDefinitions.Image> startImages;
@@ -27,7 +27,7 @@ public class Controller : MonoBehaviour
     void Start()
     {
         // create user and configure cache
-        user = new DataDefinitions.User();
+        user = new UserUtils.User();
         cacheManager = GetComponent<CacheManager>();
         cacheManager.UserDirectory = user.Name;
 
