@@ -2,6 +2,7 @@
 using System.Collections;
 using System.IO;
 using System.Text;
+using System;
 
 public class FileUtils : MonoBehaviour
 {
@@ -10,10 +11,9 @@ public class FileUtils : MonoBehaviour
     private static Encoding encoding = Encoding.UTF8;
     public static Encoding FileEncoding { get { return encoding; } set { encoding = value; } }
 
-
     public static void SaveTextureToFile(Texture2D texture, string filepath)
     {
-        SaveToFile(texture.EncodeToPNG(), filepath);
+        SaveToFile(texture.EncodeToJPG(), filepath);
     }
 
     public static void SaveTextToFile(string text, string filepath)
@@ -23,13 +23,15 @@ public class FileUtils : MonoBehaviour
 
     public static void SaveToFile(byte[] bytes, string filepath)
     {
-        using (var file = File.Open(filepath, FileMode.Create))
+        try
         {
-            using (var w = new BinaryWriter(file))
-            {
-                w.Write(bytes, 0, bytes.Length);
-            }
+            File.WriteAllBytes(filepath, bytes);
         }
+        catch (Exception e)
+        {
+            Debug.Log(e);
+        }
+    
     }
 
 

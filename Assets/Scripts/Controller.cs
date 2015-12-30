@@ -9,14 +9,15 @@ using UnityEngine.UI;
 public class Controller : MonoBehaviour
 {
     private static Controller instance;
-    public static Controller GetInstance { get { return instance;  } }
+    public static Controller GetInstance { get { return instance; } }
 
     public GameObject Grid, ImagePreviewManager;
 
     private UserUtils.User user;
     private Cell[] cells;
     private CacheManager cacheManager;
-    private List<DataDefinitions.Image> startImages;
+    private WebUtils webUtils;
+    private List<DataDefinitions.Image> startImages, images = new List<DataDefinitions.Image>();
 
     void Awake()
     {
@@ -30,6 +31,9 @@ public class Controller : MonoBehaviour
         user = new UserUtils.User();
         cacheManager = GetComponent<CacheManager>();
         cacheManager.UserDirectory = user.Name;
+
+        // get utils
+        webUtils = GetComponent<WebUtils>();
 
         // create the images grid
         cells = Grid.GetComponent<CellsGenerator>().SetupGrid();
@@ -49,13 +53,14 @@ public class Controller : MonoBehaviour
     {
 
         var imagePreviewMgr = ImagePreviewManager.GetComponent<ImagePreviewManager>();
-        imagePreviewMgr.OnCloseCallback = (i, a) => {
-            if(a == global::ImagePreviewManager.ActionType.DISLIKE)
+        imagePreviewMgr.OnCloseCallback = (i, a) =>
+        {
+            if (a == global::ImagePreviewManager.ActionType.DISLIKE)
             {
                 user.MarkAsDisliked(cells[i].Image.metas);
                 nextImage(cells[i]);
             }
-            else if(a == global::ImagePreviewManager.ActionType.LIKE)
+            else if (a == global::ImagePreviewManager.ActionType.LIKE)
             {
                 user.MarkAsLiked(cells[i].Image.metas);
                 nextImage(cells[i]);
@@ -80,6 +85,16 @@ public class Controller : MonoBehaviour
         cell.Image = img;
     }
 
+    bool prout = false;
+    void Update()
+    {
+        if (prout && Time.time > 20)
+        {
+            Debug.Log("prout");
+            downloadNewImages();
+            prout = false;
+        }
+    }
 
     private void assignRandomStartImages()
     {
@@ -97,6 +112,44 @@ public class Controller : MonoBehaviour
             user.MarkAsSeen(img.metas.Id);
             cell.Image = img;
         }
+    }
+
+    // =======================================================
+
+    void downloadNewImages()
+    {
+        webUtils.Post(webUtils.ServiceUrl + "rest/get/10", user.TagsVectorAsJson(), (bytes, error) =>
+        {
+            if (error != null)
+            {
+                Debug.Log("ERROR DOWNLOADING IMAGES " + error);
+            }
+            else
+            {
+                var jsonMetas = FileUtils.FileEncoding.GetString(bytes);
+                var metas = DataDefinitions.ImageMetas.FromJsonArray(jsonMetas);
+                foreach (var meta in metas)
+                {
+                    webUtils.Get(meta.Url, (imgBytes, imgError) =>
+                    {
+                        if (imgError != null)
+                        {
+                            Debug.Log("ERROR " + imgError);
+                        }
+                        else
+                        {
+                            var img = new DataDefinitions.Image();
+                            img.Texture = new Texture2D(0, 0);
+                            img.metas = meta;
+                            img.Texture.LoadImage(imgBytes);
+                            cacheManager.SaveImageToFile(img);
+                            images.Add(img);
+                            Debug.Log("image " + img.metas.Id + " downloaded.");
+                        }
+                    });
+                }
+            }
+        });
     }
 
 }

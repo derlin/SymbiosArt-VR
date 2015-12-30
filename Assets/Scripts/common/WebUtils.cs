@@ -6,7 +6,15 @@ using System.Text;
 public class WebUtils : MonoBehaviour
 {
 
+    public string ServiceUrl { get { return "http://192.168.0.23:8680/";  } }
+
+    private Dictionary<string,string> headers = new Dictionary<string, string>();
     public delegate void CallBack(byte[] data, string error);
+
+    void Awake()
+    {
+        headers["Content-Type"] = "application/json";
+    }
 
 
     //------------------------------------------------------------
@@ -30,7 +38,7 @@ public class WebUtils : MonoBehaviour
         WWW www;
         if (rawData != null)
         {
-            www = new WWW(url, rawData);
+            www = new WWW(url, rawData, headers);
         }
         else
         {

@@ -9,7 +9,6 @@ public class CacheManager : MonoBehaviour
 
     public string BasePath;
     public string UserDirectory = "User";
-    private string userprofileFile = "User.json";
 
     public string ImgDir
     {
@@ -30,10 +29,11 @@ public class CacheManager : MonoBehaviour
 
     // ---------------------------------------------------------
 
-    void Start()
+        void Awake()
     {
         if (string.IsNullOrEmpty(BasePath)) BasePath = Application.persistentDataPath;
         basedir = Path.Combine(BasePath, UserDirectory);
+
         if (!Directory.Exists(basedir))
         {
             Directory.CreateDirectory(basedir);
@@ -80,8 +80,8 @@ public class CacheManager : MonoBehaviour
 
     public void SaveImageToFile(DataDefinitions.Image image)
     {
-        FileUtils.SaveTextureToFile(image.Texture, image.metas.Id + ".jpg");
-        FileUtils.SaveTextToFile(image.metas.ToJson(), image.metas.Id + ".jpg");
+        FileUtils.SaveTextureToFile(image.Texture, Path.Combine(ImgDir, image.metas.Id + ".jpg"));
+        FileUtils.SaveTextToFile(image.metas.ToJson(), Path.Combine(MetaDir, image.metas.Id + ".json"));
     }
 
 

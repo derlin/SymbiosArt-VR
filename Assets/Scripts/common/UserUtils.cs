@@ -3,6 +3,7 @@ using System.Collections;
 using UnityEngine.Assertions;
 using System.Collections.Generic;
 using LgOctEngine.CoreClasses;
+using System.Text;
 
 public class UserUtils : MonoBehaviour {
 
@@ -24,6 +25,18 @@ public class UserUtils : MonoBehaviour {
             Name = "User";
         }
 
+        public string TagsVectorAsJson()
+        {
+            StringBuilder sb = new StringBuilder("{");
+            foreach (var entry in tagsVector)
+            {
+                sb.Append(string.Format("\"{0}\": {1}, ", entry.Key, entry.Value));
+            }
+
+            sb.Remove(sb.Length - 2, 2);
+            sb.Append("}");
+            return sb.ToString();
+        }
 
         protected void updateTagsVector(string[] tags, bool liked)
         {

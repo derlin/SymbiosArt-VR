@@ -38,13 +38,24 @@ public class DataDefinitions : MonoBehaviour
 
         public string ToJson()
         {
-            return LgJsonNode.ConvertToString(this);
-
+            return this.Serialize();
         }
 
         public static ImageMetas FromJson(string json)
         {
             return LgJsonNode.CreateFromJsonString<ImageMetas>(json);
+        }
+
+        public static List<ImageMetas> FromJsonArray(string json)
+        {
+            var array = LgJsonNode.CreateFromJsonString<LgJsonArray<ImageMetas>>(json);
+            List<ImageMetas> list = new List<ImageMetas>();
+            for (int i = 0; i < array.Count; i++)
+            {
+                list.Add(array.GetAt(i));
+            }
+
+            return list;
         }
     }
 
