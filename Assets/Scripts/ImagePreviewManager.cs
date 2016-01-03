@@ -12,7 +12,7 @@ public class ImagePreviewManager : MonoBehaviour {
     private float buttonSize;
     private DataDefinitions.Image image;
     private int cellIndex;
-
+    private RectTransform thisRectTransform;
     public enum ActionType { HIDE, LIKE, DISLIKE, }
     public delegate void OnClose(int cellIndex, ActionType action);
 
@@ -38,9 +38,11 @@ public class ImagePreviewManager : MonoBehaviour {
 
 
     void Start () {
+        thisRectTransform = GetComponent<RectTransform>();
+
         // fill parent
         parentRect = GetComponentInParent<RectTransform>();
-        GetComponent<RectTransform>().sizeDelta = parentRect.sizeDelta;
+        thisRectTransform.sizeDelta = parentRect.sizeDelta;
 
         buttonSize = ButtonLikeObject.GetComponent<RectTransform>().rect.height;
         Assert.IsTrue(buttonSize == ButtonDislikeObject.GetComponent<RectTransform>().rect.height);
@@ -72,6 +74,12 @@ public class ImagePreviewManager : MonoBehaviour {
         ButtonLikeObject.transform.localPosition = new Vector2(-w / 2, (-h + buttonSize) / 2);
         ButtonDislikeObject.transform.localPosition = new Vector2(w / 2, (-h + buttonSize) / 2);
 
+        var originalScale = thisRectTransform.localScale;
+        Debug.Log(thisRectTransform.localScale);
+        thisRectTransform.localScale = Vector2.zero;
+
+        iTween.ScaleTo(gameObject, iTween.Hash("scale", Vector3.one, "time", .3f, "easeType",
+            iTween.EaseType.easeInExpo));
         gameObject.SetActive(true);
     }
 
@@ -80,12 +88,20 @@ public class ImagePreviewManager : MonoBehaviour {
         image = null;
         cellIndex = -1;
         gameObject.SetActive(false);
+        thisRectTransform.localScale = Vector3.one;
     }
 
     private void hide(ActionType action)
     {
         // before hide, since hide resets cellIndex
         if (OnCloseCallback != null) OnCloseCallback(cellIndex, action);
+        //    iTween.ScaleTo(gameObject, iTween.Hash("scale", Vector3.zero, "time", .3f, "easeType",
+        //iTween.EaseType.easeOutExpo, "onComplete", "hide"));
         hide();
     }
+
+
+    // ------------------------------------------
+
+
 }
