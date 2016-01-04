@@ -118,7 +118,7 @@ public class Controller : MonoBehaviour
 
     void downloadNewImages()
     {
-        webUtils.Post(webUtils.ServiceUrl + "rest/get/10", user.TagsVectorAsJson(), (bytes, error) =>
+        webUtils.Post(webUtils.GetUrl("rest/get/10"), user.TagsVectorAsJson(), (bytes, error) =>
         {
             if (error != null)
             {

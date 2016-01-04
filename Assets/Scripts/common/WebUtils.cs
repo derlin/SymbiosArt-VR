@@ -5,23 +5,34 @@ using System.Text;
 
 public class WebUtils : MonoBehaviour
 {
+    public static WebUtils INSTANCE { get; private set; }
 
-    public string ServiceUrl { get { return "http://192.168.0.23:8680/";  } }
+    public string ServiceUrl { get { return "http://error-418.com:8680/"; } }
 
-    private Dictionary<string,string> headers = new Dictionary<string, string>();
+    private Dictionary<string, string> headers = new Dictionary<string, string>();
     public delegate void CallBack(byte[] data, string error);
 
     void Awake()
     {
         headers["Content-Type"] = "application/json";
+        INSTANCE = this;
     }
 
+    public string GetUrl(string endPoint)
+    {
+        if (endPoint[0] == '/')
+        {
+            endPoint = endPoint.Substring(1);
+        }
+
+        return ServiceUrl + endPoint;
+    }
 
     //------------------------------------------------------------
 
     public void Get(string url, CallBack cb)
     {
-        StartCoroutine(RequestAsync(url, null, cb));
+        StartCoroutine(RequestAsync(url, new byte[] { }, cb));
     }
 
     //------------------------------------------------------------
@@ -36,7 +47,7 @@ public class WebUtils : MonoBehaviour
     IEnumerator RequestAsync(string url, byte[] rawData, CallBack cb)
     {
         WWW www;
-        if (rawData != null)
+        if (rawData.Length > 0)
         {
             www = new WWW(url, rawData, headers);
         }
@@ -59,7 +70,7 @@ public class WebUtils : MonoBehaviour
         www.Dispose();
         www = null;
     }
-   
+
 
 }
 
