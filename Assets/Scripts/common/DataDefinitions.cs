@@ -8,7 +8,10 @@ using UnityEngine.Assertions;
 public class DataDefinitions : MonoBehaviour
 {
 
-
+    public enum ImageState
+    {
+        UNKNOWN,LIKED,DISLIKED
+    };
     // =============================================================
 
     [Serializable]
@@ -16,19 +19,25 @@ public class DataDefinitions : MonoBehaviour
     {
         public Texture2D Texture { get; set; }
         public ImageMetas metas;
+        public ImageState state;
+
+        public void SetTexture(byte[] rawData)
+        {
+            Texture = new Texture2D(0, 0);
+            Texture.LoadImage(rawData);
+        }
     }
+
 
     // =============================================================
 
     [Serializable]
-    public class ImageMetas : LgJsonDictionary
+    public class ImageMetas : LgJsonDictionary, IComparable<ImageMetas>
     {
         // types
-        public string Id { get { return GetValue<string>("id", ""); } set { SetValue<string>("id", value); } }
+        public string Id { get { return GetValue<string>("_id", ""); } set { SetValue<string>("_id", value); } }
 
         public string Url { get { return GetValue<string>("url", ""); } set { SetValue<string>("url", value); } }
-
-        public string Owner { get { return GetValue<string>("owner", ""); } set { SetValue<string>("owner", value); } }
 
         public LgJsonArray<string> Tags
         {
@@ -57,48 +66,10 @@ public class DataDefinitions : MonoBehaviour
 
             return list;
         }
+
+        public int CompareTo(ImageMetas other)
+        {
+            return Id.CompareTo(other.Id);
+        }
     }
-
-
-    /*public class ImageMetas
-    {
-        public string Id { get; set; }
-        public string Url { get; set; }
-        public List<string> Tags { get; set; }
-
-
-        public ImageMetas() { }
-
-        public ImageMetas(string id, string url, List<string> tags)
-        {
-            Id = id;
-            Url = url;
-            Tags = tags;
-        }
-
-        public ImageMetas(LgJsonDictionary dict)
-        {
-            Id = dict.GetValue<string>("id", "");
-            Url = dict.GetValue<string>("url", "");
-            var tagsnode = dict.GetNode<LgJsonArray<string>>("tags");
-            if (tagsnode != null && tagsnode.Count > 0)
-            {
-                Tags = new List<string>(tagsnode.ToArray<string>());
-            }
-            else
-            {
-                Tags = new List<string>();
-            }
-        }
-
-
-        public 
-
-
-        public static ImageMetas FromJson(string json)
-        {
-            var dict = LgJsonNode.CreateFromJson<LgJsonDictionary>(json);
-            return new ImageMetas(dict);
-        }
-    }*/
 }

@@ -7,7 +7,9 @@ public class WebUtils : MonoBehaviour
 {
     public static WebUtils INSTANCE { get; private set; }
 
-    public string ServiceUrl { get { return "http://error-418.com:8680/"; } }
+    public static string ServiceUrl { get { return "http://error-418.com:8680/rest"; } }
+    public static string ImagesUrl(int nbr){ return ServiceUrl + "/images/suggestions/" + nbr; }
+    public static string UsersUrl{ get { return ServiceUrl + "/user/"; } }
 
     private Dictionary<string, string> headers = new Dictionary<string, string>();
     public delegate void CallBack(byte[] data, string error);

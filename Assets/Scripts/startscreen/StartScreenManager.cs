@@ -12,7 +12,7 @@ public class StartScreenManager : MonoBehaviour {
     void Start()
     {
         wu = FindObjectOfType<WebUtils>();
-        wu.Get(wu.GetUrl("/rest/user/all"), setupDropdown);
+        wu.Get(WebUtils.UsersUrl + "all", setupDropdown);
         dropdown = GetComponentInChildren<Dropdown>();
     }
 

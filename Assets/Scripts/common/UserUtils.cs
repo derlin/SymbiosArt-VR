@@ -4,8 +4,10 @@ using UnityEngine.Assertions;
 using System.Collections.Generic;
 using LgOctEngine.CoreClasses;
 using System.Text;
+using System.IO;
 
-public class UserUtils : MonoBehaviour {
+public class UserUtils : MonoBehaviour
+{
 
     public static User CurrentUser { get; set; }
 
@@ -25,8 +27,9 @@ public class UserUtils : MonoBehaviour {
         CurrentUser.Name = name;
         var www = WebUtils.INSTANCE;
 
-        www.Get(www.GetUrl("/user/" + name), (b, e) => {
-            if(e != null)
+        www.Get(www.GetUrl("/user/" + name), (b, e) =>
+        {
+            if (e != null)
             {
                 Debug.Log("arg!!! error loading user " + name + " : " + e);
                 Application.LoadLevel(0);
@@ -47,11 +50,11 @@ public class UserUtils : MonoBehaviour {
         private Dictionary<string, int> tagsVector = new Dictionary<string, int>();
         private ICollection<string> imagesLiked = new HashSet<string>();
         private ICollection<string> imagesDisliked = new HashSet<string>();
-        private Dictionary<string, bool> imagesSeen = new Dictionary<string, bool>();
 
+        public string BasePath { get { return Path.Combine(Application.persistentDataPath, Name); } }
         public string Name { get; set; }
         public Dictionary<string, int> TagsVector { get { return tagsVector; } }
-        public int ImagesSeenCount { get { return imagesSeen.Count; } }
+        public string TagsVectorAsJson { get { return GlobalUtils.DictToJson(tagsVector); } }
         public ICollection<string> ImageLiked { get { return imagesLiked; } }
         public ICollection<string> ImageDisliked { get { return imagesDisliked; } }
 
@@ -65,8 +68,8 @@ public class UserUtils : MonoBehaviour {
             User user = new User();
             var dict = LgJsonNode.CreateFromJsonString<LgJsonDictionary>(json);
             var name = dict.GetValue<string>("name", null);
-            var tv = dict.GetValue<Dictionary<string,int>>("tagsvector", null);
-            if(tv == null || string.IsNullOrEmpty(name))
+            var tv = dict.GetValue<Dictionary<string, int>>("tagsvector", null);
+            if (tv == null || string.IsNullOrEmpty(name))
             {
                 Debug.Log("error deserializing user");
                 return user;
@@ -78,33 +81,21 @@ public class UserUtils : MonoBehaviour {
             return user;
         }
 
-        public string TagsVectorAsJson()
-        {
-            StringBuilder sb = new StringBuilder("{");
-            foreach (var entry in tagsVector)
-            {
-                sb.Append(string.Format("\"{0}\": {1}, ", entry.Key, entry.Value));
-            }
 
-            sb.Remove(sb.Length - 2, 2);
-            sb.Append("}");
-            return sb.ToString();
-        }
-
-        protected void updateTagsVector(string[] tags, bool liked)
+        public string ToJson()
         {
-            int wheight = liked ? 1 : -1;
-            foreach (var tag in tags)
-            {
-                if (tagsVector.ContainsKey(tag))
-                {
-                    tagsVector[tag] += wheight;
-                }
-                else
-                {
-                    tagsVector[tag] = wheight;
-                }
-            }
+            StringBuilder builder = new StringBuilder();
+            builder.Append("{");
+            builder.Append(GlobalUtils.JsonStringEntry("name", Name));
+            builder.Append(GlobalUtils.JsonObjectEntry("tags_vector",
+                GlobalUtils.DictToJson(tagsVector)));
+            builder.Append(GlobalUtils.JsonObjectEntry("liked_ids",
+                GlobalUtils.CollectionToJson(ImageLiked)));
+            builder.Append(GlobalUtils.JsonObjectEntry("disliked_ids",
+                GlobalUtils.CollectionToJson(imagesDisliked)));
+            builder.Append("}");
+
+            return builder.ToString();
         }
 
         protected void updateTagsVector(LgJsonArray<string> tags, bool liked)
@@ -122,16 +113,6 @@ public class UserUtils : MonoBehaviour {
                     tagsVector[tag] = wheight;
                 }
             }
-        }
-
-        public bool isAlreadySeen(string id)
-        {
-            return imagesSeen.ContainsKey(id);
-        }
-
-        public void MarkAsSeen(string id)
-        {
-            imagesSeen[id] = true;
         }
 
         public void MarkAsLiked(DataDefinitions.ImageMetas image)
