@@ -1,16 +1,14 @@
 ﻿using UnityEngine;
-using System.Collections;
 using System.Collections.Generic;
 using LgOctEngine.CoreClasses;
 using System;
-using UnityEngine.Assertions;
 
-public class DataDefinitions : MonoBehaviour
+namespace symbiosart.datas
 {
 
     public enum ImageState
     {
-        UNKNOWN,LIKED,DISLIKED
+        UNKNOWN, LIKED, DISLIKED
     };
     // =============================================================
 
@@ -36,8 +34,14 @@ public class DataDefinitions : MonoBehaviour
     {
         // types
         public string Id { get { return GetValue<string>("_id", ""); } set { SetValue<string>("_id", value); } }
-
         public string Url { get { return GetValue<string>("url", ""); } set { SetValue<string>("url", value); } }
+        public string Format { get { return GetValue<string>("originalFormat", "png"); } set { SetValue<string>("originalFormat", value); } }
+
+        // utils: return the image/meta file names based on the id
+        public string ImageFile() { return Id + "." + Format; }
+        public string ImageFile(string basepath) { return System.IO.Path.Combine(basepath, ImageFile()); }
+        public string MetaFile() { return Id + ".json"; }
+        public string MetaFile(string basepath) { return System.IO.Path.Combine(basepath, MetaFile()); }
 
         public LgJsonArray<string> Tags
         {

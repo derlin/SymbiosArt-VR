@@ -6,9 +6,9 @@ using UnityEngine.Assertions;
 public class CellNoMask : MonoBehaviour
 {
 
-    public DataDefinitions.Image Image { get { return image; } set { image = value; SetTexture(image.Texture); } }
+    public symbiosart.datas.Image Image { get { return image; } set { image = value; SetTexture(image.Texture); } }
 
-    private DataDefinitions.Image image;
+    private symbiosart.datas.Image image;
     RawImage rawImageComp;
     RectTransform rectTransformComp;
     private int cellW = -1, cellH = -1;

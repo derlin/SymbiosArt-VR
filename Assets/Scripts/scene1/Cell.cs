@@ -1,15 +1,16 @@
 ﻿using UnityEngine;
 using System.Collections;
-using UnityEngine.UI;
+
 using UnityEngine.Assertions;
+using symbiosart.datas;
 
 public class Cell : MonoBehaviour
 {
 
-    public DataDefinitions.Image Image { get { return image; } set { image = value; SetTexture(image.Texture); } }
+    public Image Image { get { return image; } set { image = value; SetTexture(image.Texture); } }
 
-    private DataDefinitions.Image image;
-    RawImage rawImageComp;
+    private Image image;
+    UnityEngine.UI.RawImage rawImageComp;
     RectTransform rectTransformComp;
     private int cellW = -1, cellH = -1;
 
@@ -19,7 +20,7 @@ public class Cell : MonoBehaviour
     public bool IsInPreview { get; set; }
     void Awake()
     {
-        rawImageComp = GetComponentInChildren<RawImage>();
+        rawImageComp = GetComponentInChildren<UnityEngine.UI.RawImage>();
         rawImageComp.enabled = false;
         rawImageComp.CrossFadeAlpha(0f, 0, false);
         rectTransformComp = rawImageComp.GetComponent<RectTransform>();
@@ -28,7 +29,7 @@ public class Cell : MonoBehaviour
 
     private void computeCellSize()
     {
-        var glg = GetComponentInParent<GridLayoutGroup>();
+        var glg = GetComponentInParent<UnityEngine.UI.GridLayoutGroup>();
         Assert.IsNotNull(glg);
 
         var prect = glg.cellSize;
@@ -74,17 +75,6 @@ public class Cell : MonoBehaviour
         rawImageComp.texture = texture;
         lastUpdateTime = Time.time;
         rawImageComp.CrossFadeAlpha(1, dur, false);
-    }
-
-    void DownloadTexture(DataDefinitions.Image image)
-    {
-        WebUtils.INSTANCE.Get(image.metas.Url, (bs, err) => {
-            if(err != null)
-            {
-                image.SetTexture(bs);
-                SetTexture(image.Texture);
-            }
-        });
     }
 
 }

@@ -1,7 +1,7 @@
 ﻿using UnityEngine;
-using System.Collections;
 using UnityEngine.Assertions;
 using UnityEngine.UI;
+using symbiosart.datas;
 
 public class PreviewManager : MonoBehaviour
 {
@@ -12,7 +12,7 @@ public class PreviewManager : MonoBehaviour
     private RectTransform parentRect;
     private float buttonSize;
     private RectTransform thisRectTransform;
-    private ProfileManager profileMgr;
+    private Manager profileMgr;
 
     private Cell visibleCell;
     public Cell VisibleCell
@@ -24,7 +24,7 @@ public class PreviewManager : MonoBehaviour
     void Start()
     {
         thisRectTransform = GetComponent<RectTransform>();
-        profileMgr = ScriptHolderObject.GetComponent<ProfileManager>();
+        profileMgr = ScriptHolderObject.GetComponent<Manager>();
 
         // fill parent
         parentRect = GetComponentInParent<RectTransform>();
@@ -35,13 +35,13 @@ public class PreviewManager : MonoBehaviour
 
         ButtonLikeObject.GetComponent<Button>().onClick.AddListener(() =>
         {
-            VisibleCell.Image.state = DataDefinitions.ImageState.LIKED;
+            VisibleCell.Image.state = ImageState.LIKED;
             next();
         });
 
         ButtonDislikeObject.GetComponent<Button>().onClick.AddListener(() =>
         {
-            VisibleCell.Image.state = DataDefinitions.ImageState.DISLIKED;
+            VisibleCell.Image.state = ImageState.DISLIKED;
             next();
         });
 
@@ -58,8 +58,10 @@ public class PreviewManager : MonoBehaviour
     {
         VisibleCell.IsInPreview = true;
         var image = VisibleCell.Image;
-        GlobalUtils.ScaleAndSetTexture(RawImageObject.GetComponent<RawImage>(),
+
+        scaleAndSetTexture(RawImageObject.GetComponent<RawImage>(),
             image.Texture, parentRect.rect.width - buttonSize, parentRect.rect.height - buttonSize);
+
         var rect = RawImageObject.GetComponent<RectTransform>().rect;
         float w = rect.width;
         float h = rect.height;
@@ -79,10 +81,12 @@ public class PreviewManager : MonoBehaviour
     private void next()
     {
         hide();
-        var newImg = profileMgr.GetNextImage(VisibleCell.Image);
-        VisibleCell.Image = newImg;
-        VisibleCell.IsInPreview = false;
-        VisibleCell = null;
+        profileMgr.GetNextImage(VisibleCell.Image, newImg =>
+        {
+            VisibleCell.Image = newImg;
+            VisibleCell.IsInPreview = false;
+            VisibleCell = null;
+        });
     }
 
     private void hide()
@@ -93,5 +97,31 @@ public class PreviewManager : MonoBehaviour
 
     // ------------------------------------------
 
+    private void scaleAndSetTexture(RawImage ri, Texture texture, float maxWidth, float maxHeight)
+    {
+
+        float h = texture.height, w = texture.width;
+        float finalH = h, finalW = w;
+
+        if (h > maxHeight || w > maxWidth) // if scaling necessary
+        {
+            if ((h / maxHeight) < (w / maxWidth))
+            {
+                finalW = maxWidth;
+                finalH = Mathf.CeilToInt((h / w) * finalW);
+            }
+            else
+            {
+                finalH = maxHeight;
+                finalW = (w / h) * finalH;
+            }
+
+        }
+
+
+        ri.texture = texture;
+        RectTransform rectTransform = ri.GetComponent<RectTransform>();
+        rectTransform.sizeDelta = new Vector2(finalW, finalH);
+    }
 
 }

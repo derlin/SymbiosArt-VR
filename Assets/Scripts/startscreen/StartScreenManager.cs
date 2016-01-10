@@ -1,37 +1,59 @@
 ﻿using UnityEngine;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine.UI;
 using LgOctEngine.CoreClasses;
+using symbiosart.datas;
+using symbiosart.constants;
+using symbiosart.threading;
+using System.Collections;
+using System;
 
-public class StartScreenManager : MonoBehaviour {
+public class StartScreenManager : MonoBehaviour
+{
 
-    WebUtils wu;
-    Dropdown dropdown;
+    public static User User;
+    LoadUserWorker loadUserWorker;
+
+    private Dropdown dropdown;
+    private Text textHolder;
+    private float dots;
 
     void Start()
     {
-        wu = FindObjectOfType<WebUtils>();
-        wu.Get(WebUtils.UsersUrl + "all", setupDropdown);
         dropdown = GetComponentInChildren<Dropdown>();
+        textHolder = GetComponentInChildren<Text>();
+        StartCoroutine(getUsers(setupDropdown));
     }
 
-    void setupDropdown(byte[] data, string error)
+    void Update()
     {
-        if(error != null)
+        if (loadUserWorker != null)
+        {
+            if (loadUserWorker.IsFinished())
+            {
+                User = loadUserWorker.User;
+                Application.LoadLevel(1);
+            }
+            else
+            {
+                if (dots == 3) { textHolder.text = "Loading"; dots = 0; }
+                else { textHolder.text += "."; dots++; }
+            }
+        }
+    }
+
+    void setupDropdown(string[] userNames, string error)
+    {
+        if (error != null)
         {
             Debug.Log(error);
             return;
         }
 
-        string json = FileUtils.FileEncoding.GetString(data);
-        var userNames = LgJsonNode.CreateFromJsonString<LgJsonArray<string>>(json);
-
         var dropdown = GetComponentInChildren<Dropdown>();
         dropdown.options.Clear();
         dropdown.options.Add(new Dropdown.OptionData("new..."));
 
-        for (int i = 0; i < userNames.Count; i++)
+        for (int i = 0; i < userNames.Length; i++)
         {
             dropdown.options.Add(new Dropdown.OptionData(userNames[i]));
         }
@@ -42,16 +64,36 @@ public class StartScreenManager : MonoBehaviour {
     public void OnStartButtonClick()
     {
         int i = dropdown.value;
-        if(i == 0)
+        if (i == 0)
         {
-            UserUtils.NewUser();
+            User = new User();
+            Application.LoadLevel(1);
         }
         else
         {
+            GetComponentInChildren<Button>().enabled = false;
             var name = dropdown.options[i].text;
-            UserUtils.LoadUser(name);
+            loadUserWorker = new LoadUserWorker(name);
+            loadUserWorker.Start();
+            dots = 0;
         }
-        Application.LoadLevel(1);
     }
 
+    // =================================================
+    IEnumerator getUsers(Action<string[], string> complete)
+    {
+        WWW www = new WWW(WebCs.UsersUrl("all"));
+        yield return www;
+        if (www.error != null)
+        {
+            complete(null, www.error);
+        }
+        else
+        {
+            var list = LgJsonNode.CreateFromJsonString<LgJsonArray<string>>(www.text);
+            complete(list.ToArray<string>(), null);
+
+        }
+    }
 }
+
