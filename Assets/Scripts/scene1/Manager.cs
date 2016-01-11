@@ -15,12 +15,10 @@ public class Manager : MonoBehaviour {
     public GameObject GridObject;
     private Grid grid;
 
-    private StartWorker startJob;
+    private ImagesProvider imagesProvider;
 
-    private UserManager userMgr;
+    private User user;
 
-    private float lastFetchTime;
-    private FetchMetasThread fetchMetasThread;
     private ReplaceRandomCellWorker replaceRandomCellWorker;
 
     List<ImageMetas> cachedImages = new List<ImageMetas>();
@@ -32,7 +30,8 @@ public class Manager : MonoBehaviour {
     // Use this for initialization
     void Start () {
         // create user
-        userMgr = new UserManager(StartScreenManager.User);
+        user = StartScreenManager.User;
+        if (user == null) user = new User();
 
         // setup grid
         grid = GridObject.GetComponent<Grid>();
@@ -40,63 +39,27 @@ public class Manager : MonoBehaviour {
 
         // load start images in background
         var nbr = grid.Cells.Count + Config.NBR_CACHED_IMAGES;
-        startJob = new StartWorker(userMgr.User, nbr);
-        startJob.Start();
+        imagesProvider = new ImagesProvider(user, grid.Cells.Count);
         StartCoroutine(setupCells());
 
         // setup bg workers
         replaceRandomCellWorker = new ReplaceRandomCellWorker(this);
-        lastFetchTime = Time.time;
     }
 
-
-    // Update is called once per frame
-    void Update () {
-
-        if(fetchMetasThread != null)
+    void OnDestroy()
+    {
+        if (imagesProvider != null)
         {
-            if (fetchMetasThread.IsFinished())
-            {
-                var cnt = 0;
-                foreach (var m in fetchMetasThread.Metas)
-                {
-                    if (!seenIds.Contains(m.Id))
-                    {
-                        availMetas.Enqueue(m);
-                        cnt++;
-                    }
-                }
-                Debug.Log("fetched " + cnt + " new metas. ");
-                fetchMetasThread = null;
-                lastFetchTime = Time.time;
-            }
-        }
-        else
-        {
-            if (Time.time - lastFetchTime >= Config.FETCH_METAS_INTERVAL)
-            {
-                fetchMetasThread = new FetchMetasThread(userMgr.User.TagsVectorAsJson);
-                fetchMetasThread.Start();
-            }
+            imagesProvider.Stop();
         }
     }
 
 
     public Image GetNextImage(Image oldImage)
     {
-        if(oldImage.state == ImageState.LIKED) userMgr.Like(oldImage);
-        else if(oldImage.state == ImageState.DISLIKED) userMgr.Dislike(oldImage);
-
-
-        Assert.IsTrue(cachedImages.Count > 0);
-
-        if (availMetas.Count > 0)
-            new CacheOneThread(userMgr.User.CachePath, availMetas.Dequeue(), (m, e) => {
-                if (e == null) cachedImages.Add(m);
-            }).Start();
-
-        var cached = cachedImages[cachedImages.Count - 1]; cachedImages.Remove(cached);
-        return userMgr.GetCached(cached);
+        if(oldImage.State == ImageState.LIKED) user.MarkAsLiked(oldImage.Metas);
+        else if(oldImage.State == ImageState.DISLIKED) user.MarkAsDisliked(oldImage.Metas);
+        return imagesProvider.NextImage;
     }
     
 
@@ -104,29 +67,13 @@ public class Manager : MonoBehaviour {
 
     IEnumerator setupCells()
     {
-        var cellIndex = 0;
-        var cells = grid.Cells;
-
-        while(!startJob.IsFinished() || startJob.Queue.Count > 0)
+        foreach (var c in grid.Cells)
         {
-            for(ImageMetas m = startJob.Queue.Dequeue(); m != null; m = startJob.Queue.Dequeue())
-            {
-                //Debug.Log("got one meta from bg thread " + Time.time);
-                if (cellIndex < cells.Count)
-                {
-                    cells[cellIndex].Image = userMgr.GetCached(m);
-                    cellIndex++;
-                }
-                else
-                {
-                    cachedImages.Add(m);
-                }
-            }
-            //Debug.Log("yielding");
-            yield return null; // new WaitForSeconds(1);
+            yield return new WaitWhile(() => imagesProvider.ImagesCount == 0);
+            c.Image = imagesProvider.NextImage;
+            Debug.Log(c.name + " " + c.Image);
         }
-
-        startJob = null;
+        
         Debug.Log("Setup done.");
         replaceRandomCellWorker.Running = true;
     }

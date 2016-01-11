@@ -16,8 +16,16 @@ namespace symbiosart.datas
     public class Image
     {
         public Texture2D Texture { get; set; }
-        public ImageMetas metas;
-        public ImageState state;
+        public ImageMetas Metas;
+        public ImageState State;
+
+        public Image() { }
+        public Image(ImageMetas metas, byte[] data)
+        {
+            Metas = metas;
+            SetTexture(data);
+
+        }
 
         public void SetTexture(byte[] rawData)
         {

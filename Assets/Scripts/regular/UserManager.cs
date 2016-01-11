@@ -21,11 +21,11 @@ namespace symbiosart.utils
 
         public void Cache(Image image)
         {
-            FileUtils.SaveTextToFile(image.metas.ToJson(), image.metas.MetaFile(User.CachePath));
-            FileUtils.SaveTextureToFile(image.Texture, image.metas.ImageFile(User.CachePath));
+            FileUtils.SaveTextToFile(image.Metas.ToJson(), image.Metas.MetaFile(User.CachePath));
+            FileUtils.SaveTextureToFile(image.Texture, image.Metas.ImageFile(User.CachePath));
         }
 
-        public void Uncache(Image image) { Uncache(image.metas); }
+        public void Uncache(Image image) { Uncache(image.Metas); }
         public void Uncache(ImageMetas metas)
         {
             File.Delete(metas.MetaFile(User.CachePath));
@@ -36,13 +36,13 @@ namespace symbiosart.utils
         public Image GetCached(ImageMetas metas)
         {
             Image image = new Image();
-            image.metas = metas;
+            image.Metas = metas;
             image.Texture = FileUtils.loadTextureFromDisc(metas.ImageFile(User.CachePath));
             return image;
         }
 
 
-        public void Like(Image image) { Like(image.metas); }
+        public void Like(Image image) { Like(image.Metas); }
         public void Like(ImageMetas metas)
         {
             User.MarkAsLiked(metas);
@@ -50,7 +50,7 @@ namespace symbiosart.utils
         }
 
 
-        public void Dislike(Image image) { Dislike(image.metas); }
+        public void Dislike(Image image) { Dislike(image.Metas); }
         public void Dislike(ImageMetas metas)
         {
             User.MarkAsDisliked(metas);

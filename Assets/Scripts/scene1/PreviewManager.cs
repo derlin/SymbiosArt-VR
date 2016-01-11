@@ -35,13 +35,13 @@ public class PreviewManager : MonoBehaviour
 
         ButtonLikeObject.GetComponent<Button>().onClick.AddListener(() =>
         {
-            VisibleCell.Image.state = ImageState.LIKED;
+            VisibleCell.Image.State = ImageState.LIKED;
             next();
         });
 
         ButtonDislikeObject.GetComponent<Button>().onClick.AddListener(() =>
         {
-            VisibleCell.Image.state = ImageState.DISLIKED;
+            VisibleCell.Image.State = ImageState.DISLIKED;
             next();
         });
 
