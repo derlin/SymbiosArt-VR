@@ -176,5 +176,21 @@ namespace symbiosart.threading
             }
             return false;
         }
+
+        public T[] RetrieveAll()
+        {
+            lock (_lock)
+            {
+                var count = _inner.Count;
+                if (count > 0)
+                {
+                    T[] t = _inner.ToArray<T>();
+                     _inner.RemoveAll(x => true);
+                    return t;
+                }
+
+                return null;
+            }
+        }
     }
 }

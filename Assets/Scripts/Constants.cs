@@ -9,7 +9,8 @@ namespace symbiosart.constants
 {
     public class Config
     {
-        public static readonly float FETCH_METAS_INTERVAL = 20; // in seconds
+        public static readonly float FETCH_METAS_INTERVAL = 15; // in seconds
+        public static readonly int NBR_METAS_PER_FETCH = 2; // in seconds
         public static readonly int NBR_CACHED_IMAGES = 20; // in seconds
 
     }

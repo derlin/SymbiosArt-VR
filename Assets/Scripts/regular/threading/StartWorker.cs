@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net;
+using System.Threading;
 
 namespace symbiosart.threading
 {
@@ -11,10 +12,12 @@ namespace symbiosart.threading
         private User user;
         private int nbr;
 
-        //public SafeList<ImageMetas> safeList = new SafeList<ImageMetas>();
+        //public List<ImageMetas> m_metas = new List<ImageMetas>();
+        //public List<ImageMetas> Metas { get { return m_metas; } }
 
-        private List<ImageMetas> m_metas = new List<ImageMetas>();
-        public List<ImageMetas> Metas { get { return m_metas; } }
+        public SafeQueue<ImageMetas> Queue = new SafeQueue<ImageMetas>();
+
+        private SafeQueue<object> asyncTasks = new SafeQueue<object>();
 
         private List<Exception> m_errors = new List<Exception>();
         public List<Exception> Exceptions { get { return m_errors; } }
@@ -28,41 +31,56 @@ namespace symbiosart.threading
 
         protected override void DoInBackground()
         {
-            loadAlreadyCachedMetas();
+            var ids = loadAlreadyCachedMetas();
 
-            if (nbr > 0)
+            if (ids.Count < nbr)
             {
                 var metas = downloadMetas();
+                if(metas == null)
+                {
+                    return;
+                }
+
                 foreach (var m in metas)
                 {
-                    if (downloadImage(m))
-                    {
-                        File.WriteAllText(m.MetaFile(user.CachePath), m.ToJson());
-                        m_metas.Add(m);
-                    }
+                    if (ids.Contains(m.Id)) continue;
+                    ids.Add(m.Id);
+                    cacheOne(m);
+                    asyncTasks.Enqueue(new object());
                 }
             }
 
         }
 
+        protected override void OnFinished()
+        {
+            while(asyncTasks.Count > 0)
+            {
+                Thread.Sleep(1000);
+            }
+        }
+
         private List<ImageMetas> downloadMetas()
         {
-            try {
+            try
+            {
                 using (WebClient webClient = new WebClient())
                 {
                     webClient.Headers["Content-Type"] = "application/json";
                     string jsonString = webClient.UploadString(constants.WebCs.ImagesUrl(nbr), user.TagsVectorAsJson);
                     return ImageMetas.FromJsonArray(jsonString);
                 }
-            }catch(Exception e)
+            }
+            catch (Exception e)
             {
                 m_errors.Add(e);
                 return null;
             }
         }
 
-        private void loadAlreadyCachedMetas()
+        private List<string> loadAlreadyCachedMetas()
         {
+            List<string> ids = new List<string>();
             if (Directory.Exists(user.CachePath))
             {
                 foreach (var f in Directory.GetFiles(user.CachePath, "*.json"))
@@ -73,8 +91,8 @@ namespace symbiosart.threading
                     // ensure the image file exists
                     if (File.Exists(f.Replace("json", m.Format)))
                     {
-                        m_metas.Add(m);
-                        nbr--;
+                        Queue.Enqueue(m);
+                        ids.Add(m.Id);
                     }
                     else // no image file, delete meta
                     {
@@ -82,34 +100,34 @@ namespace symbiosart.threading
                     }
                 }
             }
+
+            return ids;
         }
 
-        private bool downloadImage(ImageMetas metas)
+        private void cacheOne(ImageMetas metas)
         {
             try
             {
-
                 using (WebClient webClient = new WebClient())
                 {
-                    
-
-                    //webClient.DownloadFileCompleted += (o,e) => { for async
-                    //    if (e.Error)
-                    //    {
-
-                    //    }
-                    //};
+                    webClient.DownloadFileCompleted += (o, e) =>
+                    {
+                        if (e.Error == null)
+                        {
+                            File.WriteAllText(metas.MetaFile(user.CachePath), metas.ToJson());
+                            Queue.Enqueue(metas);
+                            asyncTasks.Dequeue();
+                        }
+                    };
 
                     var path = metas.ImageFile(user.CachePath);
                     var uri = new Uri(metas.Url.Replace("https://", "http://"));
-                    webClient.DownloadFile(uri, path);
-                    return true;
+                    webClient.DownloadFileAsync(uri, path);
                 }
             }
             catch (Exception e)
             {
                 m_errors.Add(e);
-                return false;
             }
         }
     }

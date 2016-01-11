@@ -81,12 +81,10 @@ public class PreviewManager : MonoBehaviour
     private void next()
     {
         hide();
-        profileMgr.GetNextImage(VisibleCell.Image, newImg =>
-        {
+        var newImg = profileMgr.GetNextImage(VisibleCell.Image);
             VisibleCell.Image = newImg;
             VisibleCell.IsInPreview = false;
             VisibleCell = null;
-        });
     }
 
     private void hide()

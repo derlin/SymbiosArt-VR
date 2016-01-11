@@ -39,7 +39,6 @@ public class Cell : MonoBehaviour
 
     void SetTexture(Texture texture)
     {
-        Debug.Log("setting texture");
         if (cellH < 0 || cellW < 0) computeCellSize();
 
         //Debug.Log(cellW + " " + cellH);

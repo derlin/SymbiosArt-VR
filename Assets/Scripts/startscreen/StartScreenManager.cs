@@ -6,6 +6,7 @@ using symbiosart.constants;
 using symbiosart.threading;
 using System.Collections;
 using System;
+using System.Collections.Generic;
 
 public class StartScreenManager : MonoBehaviour
 {
@@ -41,7 +42,7 @@ public class StartScreenManager : MonoBehaviour
         }
     }
 
-    void setupDropdown(string[] userNames, string error)
+    void setupDropdown(List<string> userNames, string error)
     {
         if (error != null)
         {
@@ -53,9 +54,10 @@ public class StartScreenManager : MonoBehaviour
         dropdown.options.Clear();
         dropdown.options.Add(new Dropdown.OptionData("new..."));
 
-        for (int i = 0; i < userNames.Length; i++)
+        foreach (var name in userNames)
         {
-            dropdown.options.Add(new Dropdown.OptionData(userNames[i]));
+            dropdown.options.Add(new Dropdown.OptionData(name));
+
         }
         dropdown.RefreshShownValue();
     }
@@ -80,7 +82,7 @@ public class StartScreenManager : MonoBehaviour
     }
 
     // =================================================
-    IEnumerator getUsers(Action<string[], string> complete)
+    IEnumerator getUsers(Action<List<string>, string> complete)
     {
         WWW www = new WWW(WebCs.UsersUrl("all"));
         yield return www;
@@ -90,8 +92,13 @@ public class StartScreenManager : MonoBehaviour
         }
         else
         {
-            var list = LgJsonNode.CreateFromJsonString<LgJsonArray<string>>(www.text);
-            complete(list.ToArray<string>(), null);
+            var result = LgJsonNode.CreateFromJsonString<LgJsonArray<string>>(www.text);
+            List<string> list = new List<string>();
+            for (int i = 0; i < result.Count; i++)
+            {
+                list.Add(result[i]);
+            }
+            complete(list, null);
 
         }
     }
