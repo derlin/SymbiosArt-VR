@@ -5,14 +5,16 @@ using derlin.symbiosart.datas;
 using derlin.symbiosart.constants;
 using System.Collections.Generic;
 using UnityEngine.SceneManagement;
+using System.IO;
 
 public class PausePanel : MonoBehaviour
 {
 
     public InputField NameInputField;
-    public Button SaveButton, QuitButton;
+    public Button SaveButton, QuitButton, ExportLikedButton;
     public Text StatusText;
 
+    derlin.symbiosart.threading.DownloadLikedImagesJob downloadImagesThread;
     bool saving, isShowing;
 
     void Start()
@@ -21,6 +23,7 @@ public class PausePanel : MonoBehaviour
 
         QuitButton.onClick.AddListener(OnQuitButtonClicked);
         SaveButton.onClick.AddListener(OnSaveButtonClicked);
+        ExportLikedButton.onClick.AddListener(OnExportButtonClicked);
 
         NameInputField.onValueChanged.AddListener((t) =>
             SaveButton.enabled = !(string.IsNullOrEmpty(t) || t == User.DEFAULT_NAME));
@@ -59,6 +62,12 @@ public class PausePanel : MonoBehaviour
             if (StatusText.text.EndsWith("...")) StatusText.text.Replace("...", "");
             else StatusText.text += ".";
         }
+
+        if(downloadImagesThread != null && downloadImagesThread.IsFinished())
+        {
+            StatusText.text = "Images exported.";
+            downloadImagesThread = null;
+        }
     }
 
     private void OnSaveButtonClicked()
@@ -71,6 +80,26 @@ public class PausePanel : MonoBehaviour
         StatusText.text = "saving";
 
         StartCoroutine(saveUser(username, user));
+    }
+
+    public void OnExportButtonClicked()
+    {
+        if(downloadImagesThread != null)
+        {
+            StatusText.text = "Already exporting images...";
+            return;
+        }
+
+        var path = System.Environment.GetFolderPath(System.Environment.SpecialFolder.MyPictures);
+        //var path = EditorUtility.SaveFolderPanel("Save textures to directory", "", "");
+        if (path.Length != 0)
+        {
+            path = Path.Combine(path, "symbiosart-liked-images");
+            if (!Directory.Exists(path)) Directory.CreateDirectory(path);
+            downloadImagesThread = new derlin.symbiosart.threading.DownloadLikedImagesJob(path);
+            downloadImagesThread.Start();
+            StatusText.text = "Exporting images...";
+        }
     }
 
     public void OnQuitButtonClicked()

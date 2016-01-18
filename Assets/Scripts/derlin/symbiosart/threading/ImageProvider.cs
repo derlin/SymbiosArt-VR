@@ -114,7 +114,7 @@ namespace derlin.symbiosart.threading
                 {
                     metasWebClient.Encoding = Encoding.UTF8;
                     metasWebClient.Headers["Content-Type"] = "application/json";
-                    string jsonString = metasWebClient.UploadString(WebCs.ImagesUrl(nbr), 
+                    string jsonString = metasWebClient.UploadString(WebCs.ImageSuggestionsUrl(nbr), 
                         User.CurrentUser.TagsVectorAsJson());
                     return ImageMetas.FromJsonArray(jsonString);
                 }
