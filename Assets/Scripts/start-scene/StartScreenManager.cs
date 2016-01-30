@@ -11,8 +11,6 @@ using Newtonsoft.Json;
 public class StartScreenManager : MonoBehaviour
 {
 
-    public static User User;
-
     // components
     public Dropdown Dropdown;
     public Text StatusText;
@@ -61,7 +59,7 @@ public class StartScreenManager : MonoBehaviour
         int i = Dropdown.value;
         if (i == 0) // "New..." option
         {
-            User = User.NewUser();
+            User.NewUser();
             SceneManager.LoadScene(Config.MAIN_SCENE_NAME);
         }
         else

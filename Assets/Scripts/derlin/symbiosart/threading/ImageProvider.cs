@@ -50,7 +50,7 @@ namespace derlin.symbiosart.threading
         }
 
         // the cachedImage "queue"
-        private FixedSizedSafeQueue<CachedImg> imagesQueue;
+        private FixedSizedQueue<CachedImg> imagesQueue;
 
         private int sleepTime = Config.FETCH_METAS_INTERVAL * 1000; // pause between fetches
         private List<string> seenIds = new List<string>(); // avoid duplicates during one session
@@ -59,7 +59,7 @@ namespace derlin.symbiosart.threading
 
         public ImagesProvider(int nbrCells)
         {
-            this.imagesQueue = new FixedSizedSafeQueue<CachedImg>(nbrCells * 2);
+            this.imagesQueue = new FixedSizedQueue<CachedImg>(nbrCells * 2);
             this.thread = new Thread(run);
             Debug.Log("starting image provider");
             Start();

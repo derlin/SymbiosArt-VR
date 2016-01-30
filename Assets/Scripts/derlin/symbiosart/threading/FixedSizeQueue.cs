@@ -7,13 +7,13 @@ using System.Threading;
 
 namespace derlin.symbiosart.threading
 {
-    public class FixedSizedSafeQueue<T>
+    public class FixedSizedQueue<T>
     {
 
         private List<T> _queue = new List<T>();
         public int Capacity { get; set; }
 
-        public FixedSizedSafeQueue(int cap)
+        public FixedSizedQueue(int cap)
         {
             Capacity = cap;
         }

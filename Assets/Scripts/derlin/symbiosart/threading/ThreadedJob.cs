@@ -5,40 +5,40 @@ namespace derlin.symbiosart.threading
 {
     public class ThreadedJob
     {
-        private bool m_IsDone = false;
-        private object m_Handle = new object();
-        private System.Threading.Thread m_Thread = null;
+        private bool isDone = false;
+        private object @lock = new object();
+        private System.Threading.Thread thread = null;
 
         protected bool IsDone
         {
             get
             {
                 bool tmp;
-                lock (m_Handle)
+                lock (@lock)
                 {
-                    tmp = m_IsDone;
+                    tmp = isDone;
                 }
                 return tmp;
             }
             set
             {
-                lock (m_Handle)
+                lock (@lock)
                 {
-                    m_IsDone = value;
+                    isDone = value;
                 }
             }
         }
 
         public virtual void Start()
         {
-            m_Thread = new System.Threading.Thread(Run);
-            m_Thread.Start();
+            thread = new System.Threading.Thread(Run);
+            thread.Start();
         }
 
 
         public virtual void Abort()
         {
-            m_Thread.Abort();
+            thread.Abort();
         }
 
         // Do your threaded task. DON'T use the Unity API here

@@ -42,9 +42,9 @@ public class DragDrop : MonoBehaviour
     public void EndDrag(BaseEventData eventData)
     {
         var pointerData = eventData as PointerEventData;
-        var s = pointerData.pointerCurrentRaycast.gameObject.name.ToLower();
+        var dropArea = pointerData.pointerCurrentRaycast.gameObject.GetComponent<DropArea>();
 
-        if (s.Contains("like"))
+        if (dropArea != null) 
         {
             AnimateDropInArea();
         }
