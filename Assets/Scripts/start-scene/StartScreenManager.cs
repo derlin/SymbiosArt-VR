@@ -13,7 +13,7 @@ public class StartScreenManager : MonoBehaviour
 
     // components
     public Dropdown Dropdown;
-    public Text StatusText;
+    public Status StatusText;
     private float dots;
 
     // script state
@@ -26,26 +26,9 @@ public class StartScreenManager : MonoBehaviour
 
     void Start()
     {
-        state = State.LOADING_LIST;
+        StatusText.Working();
         StartCoroutine(getUsersList(setupDropdown));
-    }
-
-    void Update()
-    {
-        if (state != State.WAITING)
-        {
-            if (dots == 3)
-            {
-                StatusText.text = "Retrieving ";
-                StatusText.text += (state == State.LOADING_LIST ? "usernames" : "user infos");
-                dots = 0;
-            }
-            else
-            {
-                StatusText.text += ".";
-                dots++;
-            }
-        }
+        
     }
 
 
@@ -77,6 +60,7 @@ public class StartScreenManager : MonoBehaviour
             }
             Debug.Assert(id != null);
             StartCoroutine(loadUser(id, userLoaded));
+            StatusText.Working();
         }
     }
 
@@ -87,7 +71,7 @@ public class StartScreenManager : MonoBehaviour
         if (error != null)
         {
             Debug.Log(error); // TODO
-            StatusText.text = error;
+            StatusText.Done(error);
             return;
         }
 
@@ -99,6 +83,7 @@ public class StartScreenManager : MonoBehaviour
             dropdown.options.Add(new Dropdown.OptionData(u.Name));
         }
         dropdown.RefreshShownValue();
+        StatusText.Done();
     }
 
     void userLoaded(User user, string error)
@@ -110,7 +95,7 @@ public class StartScreenManager : MonoBehaviour
         }
         else
         {
-            StatusText.text = error;
+            StatusText.Done(error);
         }
     }
 
@@ -119,13 +104,11 @@ public class StartScreenManager : MonoBehaviour
     IEnumerator getUsersList(Action<string> complete)
     {
         dots = 0;
-        state = State.LOADING_LIST;
         WWW www = new WWW(WebCs.UsersUrl("all"));
         yield return www;
 
         if (www.error != null)
         {
-            state = State.WAITING;
             complete(www.error);
         }
         else
@@ -133,7 +116,6 @@ public class StartScreenManager : MonoBehaviour
             try
             {
                 usernames = JsonConvert.DeserializeObject<List<Username>>(www.text);
-                state = State.WAITING;
                 complete(null);
             }
             catch (Exception e)
@@ -147,7 +129,6 @@ public class StartScreenManager : MonoBehaviour
 
     IEnumerator loadUser(string username, Action<User, string> complete)
     {
-        state = State.LOADING_USER;
         WWW www = new WWW(WebCs.UsersUrl(username));
         yield return www;
 
@@ -160,13 +141,11 @@ public class StartScreenManager : MonoBehaviour
             try
             {
                 var user = User.FromJson(www.text);
-                state = State.WAITING;
                 complete(user, null);
             }
             catch (Exception e)
             {
                 Debug.Log(e);
-                state = State.WAITING;
                 complete(null, e.Message);
             }
         }
