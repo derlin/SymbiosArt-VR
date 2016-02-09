@@ -6,8 +6,6 @@ using derlin.symbiosart.datas;
 
 public class Manager : MonoBehaviour {
 
-    bool setupDone = false;
-
     public PausePanel PausePanel;
 
     public Grid Grid;
@@ -67,7 +65,6 @@ public class Manager : MonoBehaviour {
         }
         
         Debug.Log("Setup done.");
-        setupDone = true;
         replaceRandomCellWorker.Running = true;
     }
 

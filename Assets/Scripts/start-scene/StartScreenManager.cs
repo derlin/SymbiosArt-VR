@@ -14,7 +14,6 @@ public class StartScreenManager : MonoBehaviour
     // components
     public Dropdown Dropdown;
     public Status StatusText;
-    private float dots;
 
     // script state
     private enum State { LOADING_LIST, WAITING, LOADING_USER }
@@ -23,12 +22,25 @@ public class StartScreenManager : MonoBehaviour
     // list of available users (dict <id, name>)
     private List<Username> usernames;
 
+    void PrintMonoVersion()
+    {
+        Type type = Type.GetType("Mono.Runtime");
+        if(type != null)
+        {
+            System.Reflection.MethodInfo displayName = type.GetMethod("GetDisplayName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
+            if(displayName != null)
+            {
+                Debug.Log(displayName.Invoke(null, null));
+            }
+        }
+    }
 
     void Start()
     {
+        PrintMonoVersion();
         StatusText.Working();
         StartCoroutine(getUsersList(setupDropdown));
-        
+        Dropdown.gameObject.SetActive(false);
     }
 
 
@@ -74,16 +86,17 @@ public class StartScreenManager : MonoBehaviour
             StatusText.Done(error);
             return;
         }
-
-        var dropdown = GetComponentInChildren<Dropdown>();
-        dropdown.options.Clear();
-        dropdown.options.Add(new Dropdown.OptionData("new..."));
+        
+        Dropdown.gameObject.SetActive(true);
+        Dropdown.options.Clear();
+        Dropdown.options.Add(new Dropdown.OptionData("new..."));
         foreach (var u in usernames)
         {
-            dropdown.options.Add(new Dropdown.OptionData(u.Name));
+            Dropdown.options.Add(new Dropdown.OptionData(u.Name));
         }
-        dropdown.RefreshShownValue();
+        Dropdown.RefreshShownValue();
         StatusText.Done();
+        Debug.Log(JsonUtility.ToJson(usernames));
     }
 
     void userLoaded(User user, string error)
@@ -97,13 +110,14 @@ public class StartScreenManager : MonoBehaviour
         {
             StatusText.Done(error);
         }
+
+        Debug.Log(JsonUtility.ToJson(user));
     }
 
     // =================================================
 
     IEnumerator getUsersList(Action<string> complete)
     {
-        dots = 0;
         WWW www = new WWW(WebCs.UsersUrl("all"));
         yield return www;
 
@@ -152,7 +166,7 @@ public class StartScreenManager : MonoBehaviour
     }
 
     // ==========================================================
-
+    [Serializable]
     public class Username
     {
         [JsonProperty("_id")]

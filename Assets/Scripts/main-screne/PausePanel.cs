@@ -105,6 +105,7 @@ public class PausePanel : MonoBehaviour
     public void OnQuitButtonClicked()
     {
         if (saving) return;
+        Debug.Log(User.CurrentUser.TagsVectorAsJson());
         SceneManager.LoadScene(Config.START_SCENE_NAME);
     }
 
