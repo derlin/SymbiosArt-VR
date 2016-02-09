@@ -26,7 +26,7 @@ public class PausePanel : MonoBehaviour
         ExportLikedButton.onClick.AddListener(OnExportButtonClicked);
 
         NameInputField.onValueChanged.AddListener((t) =>
-            SaveButton.enabled = !(string.IsNullOrEmpty(t) || t == User.DEFAULT_NAME));
+            SaveButton.interactable = !(string.IsNullOrEmpty(t) || t == User.DEFAULT_NAME));
         Hide();
     }
 
@@ -42,7 +42,7 @@ public class PausePanel : MonoBehaviour
         saving = false;
         isShowing = true;
         NameInputField.text = User.CurrentUser.Name == User.DEFAULT_NAME ? "" : User.CurrentUser.Name;
-        SaveButton.enabled = !string.IsNullOrEmpty(NameInputField.text);
+        SaveButton.interactable = !string.IsNullOrEmpty(NameInputField.text);
         Time.timeScale = 0; // pause the game
         Debug.Log("pause panel show");
     }
