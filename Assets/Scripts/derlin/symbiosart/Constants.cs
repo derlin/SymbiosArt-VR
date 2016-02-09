@@ -20,7 +20,7 @@ namespace derlin.symbiosart.constants
 
     public class WebCs
     {
-        public static string ServiceUrl { get { return "http://localhost:8680/rest"; } }// "http://error-418.com:8680/rest"; } }
+        public static string ServiceUrl { get { return "http://error-418.com:8680/rest"; } } //"http://localhost:8680/rest"; } }
         public static string ImageSuggestionsUrl(int nbr) { return ServiceUrl + "/images/suggestions/" + nbr; }
         public static string ImageDetailsUrl(string id) { return ServiceUrl + "/images/" + id; }
         public static string UsersUrl(string action) { return ServiceUrl + "/user/" + action; }
