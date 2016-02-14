@@ -9,18 +9,22 @@ using System.IO;
 
 public class PausePanel : MonoBehaviour
 {
-
+    // components
     public InputField NameInputField;
     public Button SaveButton, QuitButton, ExportLikedButton;
     public Text StatusText;
 
+    // thread to download the liked images
     derlin.symbiosart.threading.DownloadLikedImagesJob downloadImagesThread;
+
+    // status flags
     bool saving, isShowing;
 
     void Start()
     {
         StatusText.gameObject.SetActive(false);
 
+        // add listeners
         QuitButton.onClick.AddListener(OnQuitButtonClicked);
         SaveButton.onClick.AddListener(OnSaveButtonClicked);
         ExportLikedButton.onClick.AddListener(OnExportButtonClicked);
@@ -30,23 +34,27 @@ public class PausePanel : MonoBehaviour
         Hide();
     }
 
+    // show/hide the panel
     public void Toggle()
     {
         if (isShowing) Hide();
         else Show();
     }
 
+    // show the panel
     void Show()
     {
         gameObject.SetActive(true);
-        saving = false;
-        isShowing = true;
+        saving = false; isShowing = true;
+
         NameInputField.text = User.CurrentUser.Name == User.DEFAULT_NAME ? "" : User.CurrentUser.Name;
         SaveButton.interactable = !string.IsNullOrEmpty(NameInputField.text);
+
         Time.timeScale = 0; // pause the game
         Debug.Log("pause panel show");
     }
 
+    // hide the panel
     void Hide()
     {
         Time.timeScale = 1; // the game starts again
@@ -57,12 +65,6 @@ public class PausePanel : MonoBehaviour
 
     void Update()
     {
-        if (isShowing && saving)
-        {
-            if (StatusText.text.EndsWith("...")) StatusText.text.Replace("...", "");
-            else StatusText.text += ".";
-        }
-
         if(downloadImagesThread != null && downloadImagesThread.IsFinished())
         {
             StatusText.text = "Images exported.";
@@ -72,15 +74,16 @@ public class PausePanel : MonoBehaviour
 
     private void OnSaveButtonClicked()
     {
-        if (saving) return;
+        if (saving) return; // avoid calling the thread twice
         var username = NameInputField.text;
         var user = User.CurrentUser;
 
         StatusText.gameObject.SetActive(true);
-        StatusText.text = "saving";
+        StatusText.text = "saving profile";
 
         StartCoroutine(saveUser(username, user));
     }
+
 
     public void OnExportButtonClicked()
     {
@@ -110,6 +113,8 @@ public class PausePanel : MonoBehaviour
     }
 
     // ============================
+
+    // coroutine: save the user profile
     IEnumerator saveUser(string username, User user)
     {
         saving = true;

@@ -1,6 +1,10 @@
 ﻿using System.Collections;
 
-
+/// <summary>
+/// abstract class for easily creating a thread from a Unity component.
+/// Only the doInBackground method is actually executed in another thread.
+/// The interaction with the Unity components can be done in the OnFinished method.
+/// </summary>
 namespace derlin.symbiosart.threading
 {
     public class ThreadedJob
@@ -9,6 +13,7 @@ namespace derlin.symbiosart.threading
         private object @lock = new object();
         private System.Threading.Thread thread = null;
 
+        // keep track of the thread status
         protected bool IsDone
         {
             get
@@ -29,13 +34,18 @@ namespace derlin.symbiosart.threading
             }
         }
 
+        // launch the job
         public virtual void Start()
         {
-            thread = new System.Threading.Thread(Run);
+            thread = new System.Threading.Thread(() =>
+            {
+                DoInBackground();
+                IsDone = true;
+            });
             thread.Start();
         }
 
-
+        // kill the job
         public virtual void Abort()
         {
             thread.Abort();
@@ -47,6 +57,7 @@ namespace derlin.symbiosart.threading
         // This is executed by the Unity main thread when the job is finished
         protected virtual void OnFinished() { }
 
+        // check if the thread is still running
         public virtual bool IsFinished()
         {
             if (IsDone)
@@ -57,20 +68,13 @@ namespace derlin.symbiosart.threading
             return false;
         }
 
-
+        // wait for the thread to finish (blocking call)
         IEnumerator WaitFor()
         {
             while (!IsFinished())
             {
                 yield return null;
             }
-        }
-
-
-        private void Run()
-        {
-            DoInBackground();
-            IsDone = true;
         }
     }
 }

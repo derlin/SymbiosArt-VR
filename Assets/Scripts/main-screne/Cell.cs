@@ -3,7 +3,9 @@ using System.Collections;
 using UnityEngine.Assertions;
 using derlin.symbiosart.datas;
 
-
+/// <summary>
+/// component managing one cell of the image grid.
+/// </summary>
 public class Cell : MonoBehaviour
 {
     /// <summary>
@@ -80,7 +82,6 @@ public class Cell : MonoBehaviour
             finalH = cellH;
             finalW = Mathf.CeilToInt((w / h) * finalH);
         }
-
 
         rectTransformComp.sizeDelta = new Vector2(finalW, finalH);
         StartCoroutine(FadeInTexture(texture));

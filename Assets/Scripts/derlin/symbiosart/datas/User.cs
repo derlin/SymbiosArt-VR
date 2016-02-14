@@ -11,7 +11,7 @@ namespace derlin.symbiosart.datas
         public static readonly string DEFAULT_NAME = "New";
         // TODO : only for debug purpose (to launch main scene without null ptr exception)
         private static User u = new User();
-        //public static User CurrentUser { get; private set; }
+
         public static User CurrentUser { get { return u; } private set { u = value; } }
 
 
@@ -83,7 +83,9 @@ namespace derlin.symbiosart.datas
             updateTagsVector(metas.Tags, false);
             DislikedIds.Add(metas.Id);
         }
+
         // ------------------------------------------------------
+
         protected void updateTagsVector(List<string> tags, bool liked)
         {
             int wheight = liked ? 1 : -1;

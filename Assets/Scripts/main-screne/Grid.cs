@@ -2,9 +2,11 @@
 using UnityEngine.UI;
 using System.Collections.Generic;
 
+/// <summary>
+/// component initializing the image cells.
+/// </summary>
 public class Grid : MonoBehaviour
 {
-
     private static readonly float MIN_DISPLAY_TIME = 60; // 1 minute
 
     /// <summary>

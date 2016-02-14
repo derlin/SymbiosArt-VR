@@ -7,6 +7,13 @@ using System.Threading;
 
 namespace derlin.symbiosart.threading
 {
+    /// <summary>
+    /// A thread-safe stack/queue with a fixed size.
+    /// When the queue reaches the max capacity, objects at the
+    /// beginning of the queue will be removed (FIFO style).
+    /// The Enqueue/Dequeue work LIFO style.
+    /// </summary>
+    /// <typeparam name="T"></typeparam>
     public class FixedSizedQueue<T>
     {
 

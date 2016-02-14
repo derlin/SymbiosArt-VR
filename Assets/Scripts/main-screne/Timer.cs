@@ -4,6 +4,10 @@ using System.IO;
 using System.Collections.Generic;
 using System.Text;
 
+/// <summary>
+/// Utility: class allowing to easily schedule a job to run
+/// periodically.
+/// </summary>
 public class Timer : MonoBehaviour
 {
     public delegate IEnumerator Tick();

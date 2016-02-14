@@ -1,10 +1,13 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+/// <summary>
+/// Component making a gameobject spin. Useful
+/// to imitate a loading gif with a static image.
+/// </summary>
 public class Spinner : MonoBehaviour
 {
-
-
+    // show the image and make it spin
     public void Show()
     {
         gameObject.SetActive(true);
@@ -14,6 +17,7 @@ public class Spinner : MonoBehaviour
             "looptype", iTween.LoopType.loop));
     }
 
+    // stop the spinning and hide the image
     public void Hide()
     {
         iTween.Stop(gameObject);

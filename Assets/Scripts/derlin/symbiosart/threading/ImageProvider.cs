@@ -85,11 +85,13 @@ namespace derlin.symbiosart.threading
         {
             while (Running)
             {
+                // compute how many images are missing
                 var nbr = imagesQueue.Capacity - imagesQueue.Count;
-                if (nbr <= 0) nbr = 10;
+                if (nbr <= 0) nbr = 10; // if none missing, default to 10 images
 
                 var metas = threadDownloadMetas(nbr);
 
+                // foreach metas, if not already evaluated, download the corresponding image
                 for (int i = metas.Count - 1; i >= 0; i--)
                 {
                     var m = metas[i];
@@ -99,6 +101,7 @@ namespace derlin.symbiosart.threading
                     }
                 }
 
+                // wait a bit
                 Thread.Sleep(sleepTime);
             }// end while
 
@@ -106,6 +109,7 @@ namespace derlin.symbiosart.threading
         }
 
 
+        // retrieve metas from the server
         private List<ImageMetas> threadDownloadMetas(int nbr)
         {
             try
@@ -121,14 +125,14 @@ namespace derlin.symbiosart.threading
             }
             catch (Exception e)
             {
-                Debug.Log(e); // TODO
-                Debug.Log("error downloading metas ");
+                // TODO: handle error properly
+                Debug.Log("error downloading metas " + e);
                 Debug.Log(User.CurrentUser.TagsVectorAsJson());
                 return new List<ImageMetas>();
             }
         }
 
-
+        // download one image from the url in the meta
         private void threadDownloadOneImage(ImageMetas metas)
         {
             try

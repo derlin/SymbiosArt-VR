@@ -4,17 +4,17 @@ using derlin.symbiosart.threading;
 using derlin.symbiosart.constants;
 using derlin.symbiosart.datas;
 
+
+/// <summary>
+/// Manager of the main scene
+/// </summary>
 public class Manager : MonoBehaviour {
 
-    public PausePanel PausePanel;
+    public PausePanel PausePanel; // the panel to show when ESC is pressed
+    public Grid Grid; // the grid holding the cells
+    private ImagesProvider imagesProvider; // the image provider (worker thread)
+    private ReplaceRandomCellWorker replaceRandomCellWorker; 
 
-    public Grid Grid;
-
-    private ImagesProvider imagesProvider;
-
-    private ReplaceRandomCellWorker replaceRandomCellWorker;
-
-    // Use this for initialization
     void Start () {
 
         // setup grid
@@ -30,22 +30,23 @@ public class Manager : MonoBehaviour {
 
     void Update()
     {
+        // show pause panel if ESC is pressed
         if (Input.GetKeyUp(KeyCode.Escape))
         {
-            Debug.Log("manager escape key");
             PausePanel.Toggle();
         }
     }
 
     void OnDestroy()
     {
+        // don't forget to explicitely kill the worker thread
         if (imagesProvider != null)
         {
             imagesProvider.Stop();
         }
     }
 
-
+    // evaluate the oldImage and return a new one
     public Image GetNextImage(Image oldImage)
     {
         if(oldImage.State == ImageState.LIKED) User.CurrentUser.MarkAsLiked(oldImage.Metas);
@@ -56,6 +57,7 @@ public class Manager : MonoBehaviour {
 
     // ==============
 
+    // coroutine called on start: assign an image to each cell
     IEnumerator setupCells()
     {
         foreach (var c in Grid.Cells)
@@ -75,6 +77,7 @@ public class Manager : MonoBehaviour {
         
         private Manager mgr;
         private Timer.TimerFunc timerFunc;
+
         public bool Running
         {
             get { return timerFunc.Running; }
@@ -87,6 +90,7 @@ public class Manager : MonoBehaviour {
             timerFunc = new Timer.TimerFunc(replaceOne, Config.REPLACE_CELL_FREQ, true);
         }
 
+        // function called at each timer tick
         public IEnumerator replaceOne()
         {
             Debug.Log("REPLACING ONE CELL");

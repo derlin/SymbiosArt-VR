@@ -10,34 +10,17 @@ using Newtonsoft.Json;
 
 public class StartScreenManager : MonoBehaviour
 {
-
     // components
     public Dropdown Dropdown;
     public Status StatusText;
 
-    // script state
-    private enum State { LOADING_LIST, WAITING, LOADING_USER }
-    private State state;
 
     // list of available users (dict <id, name>)
     private List<Username> usernames;
 
-    void PrintMonoVersion()
-    {
-        Type type = Type.GetType("Mono.Runtime");
-        if(type != null)
-        {
-            System.Reflection.MethodInfo displayName = type.GetMethod("GetDisplayName", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Static);
-            if(displayName != null)
-            {
-                Debug.Log(displayName.Invoke(null, null));
-            }
-        }
-    }
-
+    
     void Start()
     {
-        PrintMonoVersion();
         StatusText.Working();
         StartCoroutine(getUsersList(setupDropdown));
         Dropdown.gameObject.SetActive(false);
@@ -57,10 +40,11 @@ public class StartScreenManager : MonoBehaviour
             User.NewUser();
             SceneManager.LoadScene(Config.MAIN_SCENE_NAME);
         }
-        else
+        else // existing profile, get it from the API
         {
             GetComponentInChildren<Button>().enabled = false;
             var name = Dropdown.options[i].text;
+            // get the profile id from the name
             string id = null;
             foreach (var u in usernames)
             {
@@ -71,6 +55,7 @@ public class StartScreenManager : MonoBehaviour
                 }
             }
             Debug.Assert(id != null);
+            // load the profile in a coroutine
             StartCoroutine(loadUser(id, userLoaded));
             StatusText.Working();
         }
@@ -78,15 +63,17 @@ public class StartScreenManager : MonoBehaviour
 
     // =================================================
 
+    // coroutine callback
     void setupDropdown(string error)
     {
         if (error != null)
         {
-            Debug.Log(error); // TODO
+            Debug.Log(error); // TODO: better handle the error ?
             StatusText.Done(error);
             return;
         }
         
+        // ok: usernames is initialised, create the dropdown optioins
         Dropdown.gameObject.SetActive(true);
         Dropdown.options.Clear();
         Dropdown.options.Add(new Dropdown.OptionData("new..."));
@@ -99,10 +86,12 @@ public class StartScreenManager : MonoBehaviour
         Debug.Log(JsonUtility.ToJson(usernames));
     }
 
+    // coroutine callback
     void userLoaded(User user, string error)
     {
         if (error == null)
         {
+            // user initialised, launch the main scene
             Debug.Log(user);
             SceneManager.LoadScene(Config.MAIN_SCENE_NAME);
         }
@@ -111,11 +100,12 @@ public class StartScreenManager : MonoBehaviour
             StatusText.Done(error);
         }
 
-        Debug.Log(JsonUtility.ToJson(user));
+        Debug.Log("user: " + JsonUtility.ToJson(user));
     }
 
     // =================================================
 
+    // coroutine: load the list of profiles from the server
     IEnumerator getUsersList(Action<string> complete)
     {
         WWW www = new WWW(WebCs.UsersUrl("all"));
@@ -141,6 +131,7 @@ public class StartScreenManager : MonoBehaviour
 
     // =================================================
 
+    // coroutine: get the user profile from its id
     IEnumerator loadUser(string username, Action<User, string> complete)
     {
         WWW www = new WWW(WebCs.UsersUrl(username));
@@ -166,6 +157,8 @@ public class StartScreenManager : MonoBehaviour
     }
 
     // ==========================================================
+    // data structure for the unmarshalling of the /user/all API call
+
     [Serializable]
     public class Username
     {
