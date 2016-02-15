@@ -5,7 +5,6 @@ using UnityEngine.UI;
 [RequireComponent(typeof(Image))]
 public class MyDragMe : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDragHandler
 {
-    public GameObject OverlayPanel { get; set; }
 
     public bool dragOnSurfaces = true;
 
@@ -14,7 +13,6 @@ public class MyDragMe : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
 
     public void OnBeginDrag(PointerEventData eventData)
     {
-        OverlayPanel.SetActive(true);
 
         var canvas = FindInParents<Canvas>(gameObject);
         if (canvas == null)
@@ -70,7 +68,6 @@ public class MyDragMe : MonoBehaviour, IBeginDragHandler, IDragHandler, IEndDrag
         if (m_DraggingIcon != null)
             Destroy(m_DraggingIcon);
 
-        OverlayPanel.SetActive(false);
     }
 
     static public T FindInParents<T>(GameObject go) where T : Component
