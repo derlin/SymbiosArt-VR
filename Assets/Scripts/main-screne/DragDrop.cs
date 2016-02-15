@@ -11,7 +11,7 @@ public class DragDrop : MonoBehaviour
 
     private GameObject draggedObject;
 
-    private Vector2 startDragPosition;
+    private Vector3 startDragPosition;
 
     public void OnDrag(BaseEventData eventData)
     {
@@ -35,23 +35,28 @@ public class DragDrop : MonoBehaviour
 
         var pointerData = eventData as PointerEventData;
         if (pointerData == null) { return; }
-        draggedObject.transform.position = pointerData.position;
-        startDragPosition = draggedObject.transform.position;
+        var rect = draggedObject.GetComponent<RectTransform>();
+        //rect.sizeDelta = Vector3.one;
+        rect.position = new Vector3(pointerData.position.x, pointerData.position.y, 0);
+        //draggedObject.transform.position.Set(pointerData.position.x, pointerData.position.y, 0);
+        //startDragPosition = draggedObject.transform.position; 
+        startDragPosition = rect.position;
     }
 
     public void EndDrag(BaseEventData eventData)
     {
-        var pointerData = eventData as PointerEventData;
-        var dropArea = pointerData.pointerCurrentRaycast.gameObject.GetComponent<DropArea>();
+        cleanup();
+        //var pointerData = eventData as PointerEventData;
+        //var dropArea = pointerData.pointerCurrentRaycast.gameObject.GetComponent<DropArea>();
 
-        if (dropArea != null) 
-        {
-            AnimateDropInArea();
-        }
-        else
-        {
-            AnimateDropOutsideArea();
-        }
+        //if (dropArea != null) 
+        //{
+        //    AnimateDropInArea();
+        //}
+        //else
+        //{
+        //    AnimateDropOutsideArea();
+        //}
     }
 
     public void AnimateDropInArea()

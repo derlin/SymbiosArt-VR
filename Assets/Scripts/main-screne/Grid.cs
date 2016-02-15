@@ -44,7 +44,7 @@ public class Grid : MonoBehaviour
                 int i = (c * nbrRows) + r;
                 cellObj.name = "cell" + i;
 
-                cellObj.GetComponent<DragDrop>().OverlayPanel = OverlayPanel;
+                cellObj.GetComponent<MyDragMe>().OverlayPanel = OverlayPanel;
                 Cells.Add(cellObj.GetComponent<Cell>());
             }
         }

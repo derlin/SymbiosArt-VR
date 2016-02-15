@@ -2,7 +2,7 @@
 using System.Collections;
 using UnityEngine.EventSystems;
 
-public class DropArea : MonoBehaviour
+public class DropArea : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointerExitHandler
 {
     Color32 iconHoverColor, iconNormalColor;
 
@@ -26,9 +26,8 @@ public class DropArea : MonoBehaviour
         iconHoverColor = new Color32(iconNormalColor.r, iconNormalColor.g, iconNormalColor.b, 255);
     }
 
-    public void OnDrop(BaseEventData eventData)
+    public void OnDrop(PointerEventData ptr)
     {
-        var ptr = eventData as PointerEventData;
         var g = ptr.pointerDrag.GetComponent<Cell>();
         if (g != null)
         {
@@ -36,17 +35,16 @@ public class DropArea : MonoBehaviour
             g.Image.State = StateWhenDropped;
             g.Image = Manager.GetNextImage(g.Image);
         }
-        OnPtrLeave(eventData);
+        OnPointerExit(ptr);
     }
 
 
-    public void OnPtrEnter(BaseEventData eventData)
+    public void OnPointerEnter(PointerEventData ptr)
     {
-        var ptr = eventData as PointerEventData;
         if (ptr != null && ptr.dragging) iconComponent.color = iconHoverColor;
     }
 
-    public void OnPtrLeave(BaseEventData eventData)
+    public void OnPointerExit(PointerEventData data)
     {
         iconComponent.color = iconNormalColor;
     }

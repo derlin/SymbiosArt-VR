@@ -49,6 +49,7 @@ public class DropMe : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPointe
 	private Sprite GetDropSprite(PointerEventData data)
 	{
 		var originalObj = data.pointerDrag;
+        Debug.Log(originalObj);
 		if (originalObj == null)
 			return null;
 
