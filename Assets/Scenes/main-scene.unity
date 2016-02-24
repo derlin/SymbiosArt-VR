@@ -517,6 +517,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   PausePanel: {fileID: 1913120346}
   Grid: {fileID: 458151663}
+  target: {fileID: 1556549750}
 --- !u!224 &675996237
 RectTransform:
   m_ObjectHideFlags: 0
@@ -1275,8 +1276,8 @@ MonoBehaviour:
   useSelectColor: 1
   useSelectColorOnButton: 0
   useSelectColorOnToggle: 0
-  selectColor: {r: 0, g: 0, b: 1, a: 1}
-  ignoreInputsWhenLookAway: 1
+  selectColor: {r: 0.85786116, g: 0.85786116, b: 0.9044118, a: 1}
+  ignoreInputsWhenLookAway: 0
   deselectWhenLookAway: 0
 --- !u!1 &1078924464
 GameObject:
@@ -2203,7 +2204,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 0.08627451, g: 0.32156864, b: 0.62352943, a: 0.26666668}
+  m_Color: {r: 0.6911765, g: 0.650519, b: 0.650519, a: 0.26666668}
   m_RaycastTarget: 1
   m_OnCullStateChanged:
     m_PersistentCalls:

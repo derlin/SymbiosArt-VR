@@ -10,6 +10,8 @@ public class Manager : MonoBehaviour {
 
     public Grid Grid;
 
+    public CurvedUISettings target;
+
     private ImagesProvider imagesProvider;
 
     private ReplaceRandomCellWorker replaceRandomCellWorker;
@@ -20,6 +22,9 @@ public class Manager : MonoBehaviour {
         // setup grid
         Grid.SetupGrid();
 
+        // setup curved canvas
+        AddCurvedUIComponents();
+
         // load start images in background
         imagesProvider = new ImagesProvider(Grid.Cells.Count);
         StartCoroutine(setupCells());
@@ -27,6 +32,22 @@ public class Manager : MonoBehaviour {
         // setup bg workers
         replaceRandomCellWorker = new ReplaceRandomCellWorker(this);
     }
+
+    private void AddCurvedUIComponents()
+    {
+        // see CurvedUI/Scripts/Editor/CurvedUISettingsEditor.cs
+        if (target == null) return;
+
+        foreach (UnityEngine.UI.Graphic graph in ((CurvedUISettings)target).GetComponentsInChildren<UnityEngine.UI.Graphic>())
+        {
+            if (graph.GetComponent<CurvedUIVertexEffect>() == null)
+            {
+                graph.gameObject.AddComponent<CurvedUIVertexEffect>();
+                graph.SetAllDirty();
+            }
+        }
+    }
+
 
     void Update()
     {
