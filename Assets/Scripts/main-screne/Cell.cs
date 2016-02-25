@@ -21,6 +21,7 @@ public class Cell : MonoBehaviour
     /// </summary>
     public bool IsInPreview { get; set; }
 
+    public float ImageSizePercent = 0.94f; // 1 = no margin, 0 = no image
     // --------------------------------------------------------
 
     private static readonly float FADE_EFFECT_DURATION = 0.5f;
@@ -57,8 +58,8 @@ public class Cell : MonoBehaviour
     {
         var glg = GetComponentInParent<UnityEngine.UI.GridLayoutGroup>();
         var prect = glg.cellSize;
-        cellW = Mathf.FloorToInt(prect.x);
-        cellH = Mathf.FloorToInt(prect.y);
+        cellW = Mathf.FloorToInt(prect.x * ImageSizePercent);
+        cellH = Mathf.FloorToInt(prect.y * ImageSizePercent);
     }
 
     // set the texture in display, scaling it to fit the cell

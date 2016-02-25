@@ -45,22 +45,16 @@ public class MyDropMe : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
 
     public void OnPointerEnter(PointerEventData data)
     {
-        Debug.Log("ENTER "+ data.position);
         Cell cell = getDropCell(data);
         if (cell != null)
         {
             iconComponent.enabled = true;
             Container.color = highlightColor;
         }
-        else
-        {
-            Debug.Log("no cell comp");
-        }
     }
 
     public void OnPointerExit(PointerEventData data)
     {
-        Debug.Log("EXIT " + data.position);
         Container.color = normalColor;
         iconComponent.enabled = false;
     }
@@ -69,7 +63,7 @@ public class MyDropMe : MonoBehaviour, IDropHandler, IPointerEnterHandler, IPoin
     private Cell getDropCell(PointerEventData data)
     {
         var originalObj = data.pointerDrag;
-        Debug.Log(originalObj);
+
         if (originalObj == null)
             return null;
 
