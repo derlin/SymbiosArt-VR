@@ -22,7 +22,7 @@ public class PausePanel : MonoBehaviour
 
     void Start()
     {
-        StatusText.gameObject.SetActive(false);
+        StatusText.text = "";
 
         // add listeners
         QuitButton.onClick.AddListener(OnQuitButtonClicked);
@@ -49,6 +49,7 @@ public class PausePanel : MonoBehaviour
 
         NameInputField.text = User.CurrentUser.Name == User.DEFAULT_NAME ? "" : User.CurrentUser.Name;
         SaveButton.interactable = !string.IsNullOrEmpty(NameInputField.text);
+        StatusText.text = "";
 
         Time.timeScale = 0; // pause the game
         Debug.Log("pause panel show");

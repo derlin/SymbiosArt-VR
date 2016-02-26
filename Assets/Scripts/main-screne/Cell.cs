@@ -47,7 +47,6 @@ public class Cell : MonoBehaviour
     {
         // get a reference to the inner RawImage component and its transform
         rawImageComp = GetComponentInChildren<UnityEngine.UI.RawImage>();
-        rectTransformComp = rawImageComp.GetComponent<RectTransform>();
 
         // make it invisible (no image)
         rawImageComp.enabled = false;
@@ -83,7 +82,7 @@ public class Cell : MonoBehaviour
             finalW = Mathf.CeilToInt((w / h) * finalH);
         }
 
-        rectTransformComp.sizeDelta = new Vector2(finalW, finalH);
+        rawImageComp.GetComponent<RectTransform>().sizeDelta = new Vector2(finalW, finalH);
         StartCoroutine(FadeInTexture(texture));
     }
 

@@ -22,11 +22,6 @@ public class Grid : MonoBehaviour
     public GameObject OverlayPanel;
 
     /// <summary>
-    /// The detailed view panel, in case we are in the main-scene-bis
-    /// </summary>
-    public DetailedViewPanel DetailedViewPanel;
-
-    /// <summary>
     /// The cells
     /// </summary>
     public List<Cell> Cells { get; private set; }
@@ -54,9 +49,6 @@ public class Grid : MonoBehaviour
                 // if drag drop scene
                 var dragDrop = cellObj.GetComponent<DragDrop>();
                 if(dragDrop != null) dragDrop.OverlayPanel = OverlayPanel;
-
-                var cellClick = cellObj.GetComponent<CellClick>();
-                if (cellClick != null) cellClick.DetailPanel = DetailedViewPanel;
 
                 Cells.Add(cellObj.GetComponent<Cell>());
             }
