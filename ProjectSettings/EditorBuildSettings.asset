@@ -7,7 +7,5 @@ EditorBuildSettings:
   m_Scenes:
   - enabled: 1
     path: Assets/Scenes/start-scene.unity
-  - enabled: 0
-    path: Assets/Scenes/scene1.unity
   - enabled: 1
-    path: Assets/Scenes/main-scene.unity
+    path: Assets/Scenes/main-scene-bis.unity
