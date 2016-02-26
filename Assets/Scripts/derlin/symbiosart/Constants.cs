@@ -10,7 +10,6 @@ namespace derlin.symbiosart.constants
     {
         public static readonly int FETCH_METAS_INTERVAL = 15; // in seconds
         public static readonly int NBR_METAS_PER_FETCH = 2; // in seconds
-        public static readonly int NBR_CACHED_IMAGES = 20; // in seconds
         public static readonly float REPLACE_CELL_FREQ = 10; // in seconds
 
         public static readonly string MAIN_SCENE_NAME = "main-scene";

@@ -87,7 +87,7 @@ namespace derlin.symbiosart.threading
             {
                 // compute how many images are missing
                 var nbr = imagesQueue.Capacity - imagesQueue.Count;
-                if (nbr <= 0) nbr = 10; // if none missing, default to 10 images
+                if (nbr <= 0) nbr = Config.NBR_METAS_PER_FETCH; // if none missing, default to X images
 
                 var metas = threadDownloadMetas(nbr);
 
