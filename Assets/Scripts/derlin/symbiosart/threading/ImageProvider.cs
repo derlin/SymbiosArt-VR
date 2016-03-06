@@ -44,7 +44,6 @@ namespace derlin.symbiosart.threading
             get
             {
                 var img = imagesQueue.Dequeue();
-                seenIds.Add(img.Metas.Id);
                 return new Image(img.Metas, img.Bytes);
             }
         }
@@ -97,6 +96,7 @@ namespace derlin.symbiosart.threading
                     var m = metas[i];
                     if (!seenIds.Contains(m.Id) && !User.CurrentUser.AlreadyMarked(m.Id))
                     {
+						seenIds.Add(m.Id);
                         threadDownloadOneImage(m);
                     }
                 }
